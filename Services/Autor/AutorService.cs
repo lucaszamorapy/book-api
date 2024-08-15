@@ -99,5 +99,69 @@ namespace WebApi8.Services.Autor
             }
 
         }
+        public async Task<ResponseModel<List<AutorModel>>> EditarAutor(AutorEdicaoDto autorEditado)
+        {
+            ResponseModel<List<AutorModel>> /*tipo de resposta*/ resposta = new ResponseModel<List<AutorModel>>();
+            try
+            {
+                var autor = await _context.Autores.FirstOrDefaultAsync(x => x.Id == autorEditado.Id);
+
+                if (autor == null)
+                {
+                    resposta.Mensagem = "Autor não encontrado";
+                    resposta.Status = false;
+                    return resposta;
+                }
+
+                autor.Nome = autorEditado.Nome;
+                autor.Sobrenome = autorEditado.Sobrenome;
+               
+                _context.Autores.Update(autor);
+                await _context.SaveChangesAsync();
+
+                resposta.Dados = await _context.Autores.ToListAsync();
+                resposta.Mensagem = $"Autor {autor.Id} alterado com êxito";
+                resposta.Status = true;
+                return resposta;
+
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
+
+        }
+        public async Task<ResponseModel<List<AutorModel>>> ExluirAutor(int idAutor)
+        {
+            ResponseModel<List<AutorModel>> /*tipo de resposta*/ resposta = new ResponseModel<List<AutorModel>>();
+            try
+            {
+                var autor = await _context.Autores.FirstOrDefaultAsync(x => x.Id == idAutor);
+
+                if (autor == null)
+                {
+                    resposta.Mensagem = "Autor não encontrado";
+                    resposta.Status = false;
+                    return resposta;
+                }
+
+                _context.Autores.Remove(autor);
+                await _context.SaveChangesAsync();
+
+                resposta.Dados = await _context.Autores.ToListAsync();
+                resposta.Mensagem = $"Autor {autor.Id} removido com êxito";
+                resposta.Status = true;
+                return resposta;
+
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
+        }
     }
 }
