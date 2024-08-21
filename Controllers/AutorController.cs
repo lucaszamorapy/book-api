@@ -51,7 +51,7 @@ namespace WebApi8.Controllers
         [HttpDelete("ExcluirAutor")]
         public async Task<ActionResult<ResponseModel<List<AutorModel>>>> ExcluirAutor(int idAutor)
         {
-            var autorExcluido = await _autorinterface.ExluirAutor(idAutor);
+            var autorExcluido = await _autorinterface.ExcluirAutor(idAutor);
             return Ok(autorExcluido);
         }
     }

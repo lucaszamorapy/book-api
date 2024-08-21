@@ -133,7 +133,7 @@ namespace WebApi8.Services.Autor
             }
 
         }
-        public async Task<ResponseModel<List<AutorModel>>> ExluirAutor(int idAutor)
+        public async Task<ResponseModel<List<AutorModel>>> ExcluirAutor(int idAutor)
         {
             ResponseModel<List<AutorModel>> /*tipo de resposta*/ resposta = new ResponseModel<List<AutorModel>>();
             try

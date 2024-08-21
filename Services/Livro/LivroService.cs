@@ -6,6 +6,7 @@ using WebApi8.Models;
 
 namespace WebApi8.Services.Livro
 {
+
     public class LivroService : ILivroInterface
     {
         private readonly AppDbContext _context;
@@ -33,9 +34,27 @@ namespace WebApi8.Services.Livro
             }
         }
 
-        public Task<ResponseModel<LivroModel>> BuscarLivroPorIdAutor(int idAutor)
+        public async Task<ResponseModel<List<LivroModel>>> BuscarLivroPorIdAutor(int idAutor)
         {
-            throw new NotImplementedException();
+            ResponseModel<List<LivroModel>> /*tipo de resposta*/ resposta = new ResponseModel<List<LivroModel>>();
+            try
+            {
+                var livro = await _context.Livros.Include(x => x.Autor).Where(x =>  x.Autor.Id == idAutor).ToListAsync();
+                if (livro == null)
+                {
+                    resposta.Mensagem = "Nenhum registro localizado";
+                }
+                resposta.Dados = livro;
+                resposta.Mensagem = "Os livros foi coletado com êxito pelo livro";
+                resposta.Status = true;
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            };
         }
 
         public async Task<ResponseModel<LivroModel>> CriarLivro(LivroCriacaoDto novoLivro)
@@ -78,19 +97,87 @@ namespace WebApi8.Services.Livro
             }
         }
 
-        public Task<ResponseModel<List<LivroModel>>> EditarLivro(LivroEdicaoDto livro)
+        public async Task<ResponseModel<List<LivroModel>>> EditarLivro(LivroEdicaoDto livroEditado)
         {
-            throw new NotImplementedException();
+            ResponseModel<List<LivroModel>> /*tipo de resposta*/ resposta = new ResponseModel<List<LivroModel>>();
+            try
+            {
+                var livro = await _context.Livros.FirstOrDefaultAsync(x => x.Id == livroEditado.Id);
+
+                if (livro == null)
+                {
+                    resposta.Mensagem = "Livro não encontrado";
+                    resposta.Status = false;
+                    return resposta;
+                }
+
+                livro.Titulo = livroEditado.Titulo;
+
+                _context.Livros.Update(livro);
+                await _context.SaveChangesAsync();
+
+                resposta.Dados = await _context.Livros.ToListAsync();
+                resposta.Mensagem = $"Livro {livro.Id} alterado com êxito";
+                resposta.Status = true;
+                return resposta;
+
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public Task<ResponseModel<List<LivroModel>>> ExluirLivro(int idLivro)
+        public async Task<ResponseModel<List<LivroModel>>> ExcluirLivro(int idLivro)
         {
-            throw new NotImplementedException();
+            ResponseModel<List<LivroModel>> /*tipo de resposta*/ resposta = new ResponseModel<List<LivroModel>>();
+            try
+            {
+                var livro = await _context.Livros.FirstOrDefaultAsync(x => x.Id == idLivro);
+
+                if (livro == null)
+                {
+                    resposta.Mensagem = "Livro não encontrado";
+                    resposta.Status = false;
+                    return resposta;
+                }
+
+                _context.Livros.Remove(livro);
+                await _context.SaveChangesAsync();
+
+                resposta.Dados = await _context.Livros.ToListAsync();
+                resposta.Mensagem = $"Livro {livro.Id} removido com êxito";
+                resposta.Status = true;
+                return resposta;
+
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
-        public Task<ResponseModel<List<LivroModel>>> ListarLivros()
+        public async Task<ResponseModel<List<LivroModel>>> ListarLivros()
         {
-            throw new NotImplementedException();
+            ResponseModel<List<LivroModel>> /*tipo de resposta*/ resposta = new ResponseModel<List<LivroModel>>();
+            try
+            {
+                var livros = await _context.Livros.ToListAsync();
+                resposta.Dados = livros;
+                resposta.Mensagem = "Todos os livros foram coletados";
+                resposta.Status = true;
+                return resposta;
+            }
+            catch (Exception ex)
+            {
+                resposta.Mensagem = ex.Message;
+                resposta.Status = false;
+                return resposta;
+            }
         }
 
     }
